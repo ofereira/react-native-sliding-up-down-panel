@@ -35,7 +35,7 @@ const HeaderView = (props) => (
 const SlidingPanelIOS = (props) => (
   <Animated.View style={props.panelPosition === 'bottom' ? {bottom: props.heightAnim, flex: 1, position: 'absolute',} : {top: props.heightAnim, flex: 1, position: 'absolute',}}>
     <Animated.View
-            {...props.panResponder} style={{height: props.headerPanelHeight,}}>   
+      {...props.panResponder} style={{height: props.headerPanelHeight,}}>
       {props.headerView()}
     </Animated.View>
     <View style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}>
@@ -114,9 +114,11 @@ export default class SlidingPanel extends Component {
               Animated.timing(
                 this.state.heightAnim,
                 {
-                  toValue: Platform.OS === 'android' ? height-this.props.headerLayoutHeight - 25 : 
-                  height-this.props.headerLayoutHeight - this.props.maxHeight,
+                  toValue: Platform.OS === 'android' ?
+                    height-this.props.headerLayoutHeight - 25 :
+                    height-this.props.headerLayoutHeight - this.props.maxHeight,
                   duration: this.props.AnimationSpeed,
+                  useNativeDriver: false,
                 }
               ).start(() => this.props.onAnimationStop());
             }
@@ -128,6 +130,7 @@ export default class SlidingPanel extends Component {
                 {
                   toValue: 0,
                   duration: this.props.AnimationSpeed,
+                  useNativeDriver: false,
                 }
               ).start(() => this.props.onAnimationStop()); 
             }
@@ -140,6 +143,7 @@ export default class SlidingPanel extends Component {
               {
                 toValue: 0,
                 duration: this.props.AnimationSpeed,
+                useNativeDriver: false,
               }
             ).start(() => this.props.onAnimationStop());
           }
@@ -159,6 +163,7 @@ export default class SlidingPanel extends Component {
       {
         toValue: 0,
         duration: this.props.AnimationSpeed,
+        useNativeDriver: false,
       }
     ).start();
   }
@@ -168,9 +173,10 @@ export default class SlidingPanel extends Component {
     Animated.timing(
       this.state.heightAnim,
       {
-        toValue: Platform.OS === 'android' ? height-this.props.headerLayoutHeight - 25 : 
-        height-this.props.headerLayoutHeight,
+        toValue: Platform.OS === 'android' ?
+          height-this.props.headerLayoutHeight - 25 : height-this.props.headerLayoutHeight,
         duration: this.props.AnimationSpeed,
+        useNativeDriver: false,
       }
     ).start();
   }
