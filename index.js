@@ -90,7 +90,7 @@ export default class SlidingPanel extends Component {
           if((Platform.OS === 'android' ?
             sliderPosition + a - this.props.maxHeight < height - (this.props.headerLayoutHeight + 25) :
             sliderPosition + a - this.props.maxHeight < height - (this.props.headerLayoutHeight + ( this.props.maxHeight ? this.props.maxHeight : -2 ))) 
-            && sliderPosition + a - this.props.maxHeight > (this.props.maxHeight ? this.props.maxHeight : -2)){
+            && sliderPosition + a - this.props.maxHeight > -2){
             if(sliderPosition !== 0) {
               this.state.heightAnim.setValue(sliderPosition + a - this.props.maxHeight)
             }
@@ -143,6 +143,10 @@ export default class SlidingPanel extends Component {
               }
             ).start(() => this.props.onAnimationStop());
           }
+        }
+
+        if(this.props.sliderLastPosition){
+          this.props.sliderLastPosition(sliderPosition);
         }
       },
     });
