@@ -61,12 +61,12 @@ export default class SlidingPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      heightAnim: new Animated.Value(0),
+      heightAnim: new Animated.Value(props.initialHeight),
       panResponder: {},
     };
-  }
 
-  componentWillMount() {
+    sliderPosition = props.initialHeight != 0 ? props.initialHeight + props.maxHeight : 0;
+
     var a = 0;
     this.state.panResponder = PanResponder.create({
       onStartShouldSetPanResponder : () => true,
@@ -244,4 +244,5 @@ SlidingPanel.defaultProps = {
   slidingPanelLayoutHeight: 0,
   AnimationSpeed: 1000,
   maxHeight: 0,
+  initialHeight: 0,
 };
