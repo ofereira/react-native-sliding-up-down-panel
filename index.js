@@ -24,13 +24,12 @@ const styles = StyleSheet.create({
   },
 });
 
-const HeaderView = (props) => (
-    <View style={{backgroundColor: 'green',}}><Text style={{color: 'white'}}>Hello world</Text></View>
-  )
-  
-  const SlidingPanelView = (props) => (
-    <View style={{height: 200, width, backgroundColor: 'blue'}}><Text style={{color: 'white'}}>Hello world</Text></View>
-  )
+const TOP = 'TOP';
+const MIDDLE = 'MIDDLE';
+const BOTTOM = 'BOTTOM';
+
+const statuses = [TOP, MIDDLE, BOTTOM];
+
 
 const SlidingPanelIOS = (props) => (
   <Animated.View style={props.panelPosition === 'bottom' ? {bottom: props.heightAnim, flex: 1, position: 'absolute',} : {top: props.heightAnim, flex: 1, position: 'absolute',}}>
@@ -63,6 +62,7 @@ export default class SlidingPanel extends Component {
     this.state = {
       heightAnim: new Animated.Value(props.initialHeight),
       panResponder: {},
+      status: MIDDLE,
     };
 
     sliderPosition = props.initialHeight != 0 ? props.initialHeight + props.maxHeight : 0;
@@ -77,8 +77,7 @@ export default class SlidingPanel extends Component {
         if(this.props.allowDragging) {
           if(a === 0) {
             this.props.onDragStart(event, gestureState);
-          }
-          else {
+          } else {
             this.props.onDrag(event, gestureState);
           }
           if(this.props.panelPosition === 'bottom') {
@@ -100,9 +99,12 @@ export default class SlidingPanel extends Component {
           }
         }
       },
-      onPanResponderRelease        : (e, gesture) => {
-        sliderPosition = sliderPosition + a
-        if(a !== 0) {
+      onPanResponderRelease: (e, gesture) => {
+        // console.log('status', this.state.status);
+        console.log('sliderPosition', sliderPosition);
+        sliderPosition = sliderPosition + a;
+
+        if(a !== 0) { 
           this.props.onDragStop(e, gesture)
         }
         
@@ -121,35 +123,59 @@ export default class SlidingPanel extends Component {
                   useNativeDriver: false,
                 }
               ).start(() => this.props.onAnimationStop());
-            }
-            else {
+              // this.setState((prevState) => ({...prevState, status: TOP}));
+              // console.log('TOP');
+            } else {
               sliderPosition = this.props.maxHeight
               this.props.onAnimationStart();
               Animated.timing(
                 this.state.heightAnim,
                 {
-                  toValue: 0,
+                  toValue: this.props.minHeight,
                   duration: this.props.AnimationSpeed,
                   useNativeDriver: false,
                 }
               ).start(() => this.props.onAnimationStop()); 
             }
+            // this.setState((prevState) => ({...prevState, status: BOTTOM}));
+            // console.log('BOTTOM');
           }
+
           if(this.props.panelPosition === 'bottom' ? gesture.vy > 1 : gesture.vy < -1) {
             sliderPosition = 0
             this.props.onAnimationStart();
             Animated.timing(
               this.state.heightAnim,
               {
-                toValue: 0,
+                toValue: this.props.minHeight,
                 duration: this.props.AnimationSpeed,
                 useNativeDriver: false,
               }
             ).start(() => this.props.onAnimationStop());
+            console.log('undefined');
+          }
+        }
+
+        switch(true) {
+          case (sliderPosition < 180): {
+            console.log('BOTTOM');
+            this.setState((prevState) => ({...prevState, status: BOTTOM}));
+            break;
+          }
+          case (sliderPosition >= 180 && sliderPosition <= 700): {
+            console.log('MIDDLE');
+            this.setState((prevState) => ({...prevState, status: MIDDLE}));
+            break;
+          }
+          case (sliderPosition > 700): {
+            console.log('TOP');
+            this.setState((prevState) => ({...prevState, status: TOP}));
+            break;
           }
         }
 
         if(this.props.sliderLastPosition){
+          // console.log('last slider', this.props.sliderLastPosition);
           this.props.sliderLastPosition(sliderPosition);
         }
       },
@@ -221,6 +247,7 @@ SlidingPanel.propTypes = {
   visible: PropTypes.bool,
   allowDragging: PropTypes.bool,
   allowAnimation: PropTypes.bool,
+  minHeight: PropTypes.number,
   onDragStart: (event, gestureState) => {},
   onDragStop: (event, gestureState) => {},
   onDrag: (event, gestureState) => {},
@@ -245,4 +272,5 @@ SlidingPanel.defaultProps = {
   AnimationSpeed: 1000,
   maxHeight: 0,
   initialHeight: 0,
+  minHeight: 0,
 };
