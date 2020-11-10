@@ -86,11 +86,10 @@ export default class SlidingPanel extends Component {
       onPanResponderRelease: (e, gesture) => {
         sliderPosition = sliderPosition + a;
 
-        if(this.props.sliderLastPosition){
-          this.props.sliderLastPosition(sliderPosition);
-        }
-
         if(a !== 0) {
+          if(this.props.sliderLastPosition){
+            this.props.sliderLastPosition(sliderPosition);
+          }
           this.props.onDragStop(e, gesture);
           return;
         }
@@ -119,6 +118,10 @@ export default class SlidingPanel extends Component {
             this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: TOP}));
             break;
           }
+        }
+
+        if(this.props.sliderLastPosition){
+          this.props.sliderLastPosition(sliderPosition);
         }
       },
     });
