@@ -164,7 +164,7 @@ export default class SlidingPanel extends Component {
   };
 
   goToBottom = () => {
-    const sliderPosition = this.props.maxHeight;
+    const sliderPosition = this.props.headerLayoutHeight;
 
     this.props.onAnimationStart();
     Animated.timing(
