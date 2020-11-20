@@ -29,7 +29,7 @@ const SlidingPanelIOS = (props) => (
 );
 
 const SlidingPanelAndroid = (props) => (
-    <Animated.View style={props.panelPosition === 'bottom' ? {bottom: props.heightAnim, flex: 1, position: 'absolute',} : {top: props.heightAnim, flex: 1, position: 'absolute',}}>
+  <Animated.View style={props.panelPosition === 'bottom' ? {bottom: props.heightAnim, flex: 1, position: 'absolute',} : {top: props.heightAnim, flex: 1, position: 'absolute',}}>
     <Animated.View
       {...props.panResponder} style={{height: props.headerPanelHeight,}}>
       {props.headerView()}
@@ -100,20 +100,16 @@ export default class SlidingPanel extends Component {
           if(a > this.props.maxHeight * 0.1){
             //MOVE
             if(sliderPosition >= (this.props.maxHeight * 0.6)){
-              sliderPosition = this.goToTop();
-              this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
+              this.goToTop();
             }else{
-              sliderPosition = this.goToMiddle();
-              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+              this.goToMiddle();
             }
           }else{
             //RETURN TO LAST POSITION
             if (this.state.status === BOTTOM) {
-              sliderPosition = this.goToBottom();
-              this.setState((prevState) => ({...prevState, status: BOTTOM,  previousStatus: MIDDLE }));
+              this.goToBottom();
             } else if (this.state.status === MIDDLE) {
-              sliderPosition = this.goToMiddle();
-              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+              this.goToMiddle();
             }
           }
         }else if(a < 0){
@@ -121,20 +117,16 @@ export default class SlidingPanel extends Component {
           if(-a > this.props.maxHeight * 0.1){
             //MOVE
             if(sliderPosition <= (this.props.maxHeight * 0.4)){
-              sliderPosition = this.goToBottom();
-              this.setState((prevState) => ({...prevState, status: BOTTOM,  previousStatus: MIDDLE }));
+              this.goToBottom();
             }else{
-              sliderPosition = this.goToMiddle();
-              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+              this.goToMiddle();
             }
           }else{
             //RETURN TO LAST POSITION
             if (this.state.status === TOP) {
-              sliderPosition = this.goToTop();
-              this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
+              this.goToTop();
             } else if (this.state.status === MIDDLE){
-              sliderPosition = this.goToMiddle();
-              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+              this.goToMiddle();
             }
           }
         }else{
@@ -142,18 +134,15 @@ export default class SlidingPanel extends Component {
           switch(true) {
             case (sliderPosition >= (this.props.maxHeight * 0.3) && sliderPosition <= (this.props.maxHeight * 0.7)): {
               if (this.state.previousStatus === TOP) {
-                sliderPosition = this.goToBottom();
-                this.setState((prevState) => ({...prevState, status: BOTTOM, previousStatus: MIDDLE}));
+                this.goToBottom();
               } else {
-                sliderPosition = this.goToTop();
-                this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
+                 this.goToTop();
               }
               break;
             }
   
             default: {
-              sliderPosition = this.goToMiddle();
-              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+              this.goToMiddle();
               break;
             }
           }
@@ -166,9 +155,10 @@ export default class SlidingPanel extends Component {
     });
   }
 
+  /** Update slider position and set MID state */
   goToMiddle = () => {
     const screenHeight = this.props.maxHeight ? this.props.maxHeight : height;
-    const sliderPosition = screenHeight/2;
+    sliderPosition = screenHeight/2;
 
     this.props.onAnimationStart();
     Animated.timing(
@@ -180,12 +170,13 @@ export default class SlidingPanel extends Component {
       }
     ).start(() => this.props.onAnimationStop());
 
-    return sliderPosition;
+    this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
   };
 
+  /** Update slider position and set TOP state */
   goToTop = () => {
     const screenHeight = this.props.maxHeight ? this.props.maxHeight : height;
-    const sliderPosition = screenHeight;
+    sliderPosition = screenHeight;
 
     this.props.onAnimationStart();
     Animated.timing(
@@ -197,11 +188,12 @@ export default class SlidingPanel extends Component {
       }
     ).start(() => this.props.onAnimationStop());
 
-    return sliderPosition;
+    this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
   };
 
+  /** Update slider position and set BOT state */
   goToBottom = () => {
-    const sliderPosition = this.props.minHeight;
+    sliderPosition = this.props.minHeight;
 
     this.props.onAnimationStart();
     Animated.timing(
@@ -213,7 +205,7 @@ export default class SlidingPanel extends Component {
       }
     ).start(() => this.props.onAnimationStop());
 
-    return sliderPosition;
+    this.setState((prevState) => ({...prevState, status: BOTTOM,  previousStatus: MIDDLE }));
   };
 
   onRequestClose() {
