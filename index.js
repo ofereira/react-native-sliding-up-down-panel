@@ -20,7 +20,9 @@ const SlidingPanelIOS = (props) => (
       {...props.panResponder} style={{height: props.headerPanelHeight,}}>
       {props.headerView()}
     </Animated.View>
-    <View style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}>
+    <View 
+      style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}
+      {...props.panResponder}>
       {props.slidingPanelView()}
     </View>
   </Animated.View>
@@ -32,7 +34,9 @@ const SlidingPanelAndroid = (props) => (
       {...props.panResponder} style={{height: props.headerPanelHeight,}}>
       {props.headerView()}
     </Animated.View>
-    <Animated.View style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}>
+    <Animated.View 
+      style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}
+      {...props.panResponder}>
       {props.slidingPanelView()}
     </Animated.View>
   </Animated.View>
@@ -81,6 +85,8 @@ export default class SlidingPanel extends Component {
         }
       },
       onPanResponderRelease: (e, gesture) => {
+        const listenerPosition = sliderPosition + a; //to save real last position
+
         if(sliderPosition + a > ( this.props.maxHeight ? this.props.maxHeight : height )){
           sliderPosition = this.props.maxHeight ? this.props.maxHeight : height;
         }else if(sliderPosition + a < this.props.minHeight){
@@ -89,35 +95,72 @@ export default class SlidingPanel extends Component {
           sliderPosition = sliderPosition + a;
         }
 
-        if(a !== 0) {
-          if(this.props.sliderLastPosition){
-            this.props.sliderLastPosition(sliderPosition + a);
-          }
-          this.props.onDragStop(e, gesture);
-          return;
-        }
-
-        switch(true) {
-          case (sliderPosition >= (this.props.maxHeight * 0.2) && sliderPosition <= (this.props.maxHeight * 0.8)): {
-            if (this.state.previousStatus === TOP) {
-              sliderPosition = this.goToBottom();
-              this.setState((prevState) => ({...prevState, status: BOTTOM, previousStatus: MIDDLE}));
-            } else {
+        if(a > 0){
+          //going up (a is positive)
+          if(a > this.props.maxHeight * 0.1){
+            //MOVE
+            if(sliderPosition >= (this.props.maxHeight * 0.6)){
               sliderPosition = this.goToTop();
               this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
+            }else{
+              sliderPosition = this.goToMiddle();
+              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
             }
-            break;
+          }else{
+            //RETURN TO LAST POSITION
+            if (this.state.status === BOTTOM) {
+              sliderPosition = this.goToBottom();
+              this.setState((prevState) => ({...prevState, status: BOTTOM,  previousStatus: MIDDLE }));
+            } else if (this.state.status === MIDDLE) {
+              sliderPosition = this.goToMiddle();
+              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+            }
           }
-
-          default: {
-            sliderPosition = this.goToMiddle();
-            this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
-            break;
+        }else if(a < 0){
+          //going down (a is negative)
+          if(-a > this.props.maxHeight * 0.1){
+            //MOVE
+            if(sliderPosition <= (this.props.maxHeight * 0.4)){
+              sliderPosition = this.goToBottom();
+              this.setState((prevState) => ({...prevState, status: BOTTOM,  previousStatus: MIDDLE }));
+            }else{
+              sliderPosition = this.goToMiddle();
+              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+            }
+          }else{
+            //RETURN TO LAST POSITION
+            if (this.state.status === TOP) {
+              sliderPosition = this.goToTop();
+              this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
+            } else if (this.state.status === MIDDLE){
+              sliderPosition = this.goToMiddle();
+              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+            }
+          }
+        }else{
+          //tap
+          switch(true) {
+            case (sliderPosition >= (this.props.maxHeight * 0.3) && sliderPosition <= (this.props.maxHeight * 0.7)): {
+              if (this.state.previousStatus === TOP) {
+                sliderPosition = this.goToBottom();
+                this.setState((prevState) => ({...prevState, status: BOTTOM, previousStatus: MIDDLE}));
+              } else {
+                sliderPosition = this.goToTop();
+                this.setState((prevState) => ({...prevState, status: TOP, previousStatus: MIDDLE}));
+              }
+              break;
+            }
+  
+            default: {
+              sliderPosition = this.goToMiddle();
+              this.setState((prevState) => ({...prevState, status: MIDDLE, previousStatus: prevState.status}));
+              break;
+            }
           }
         }
 
         if(this.props.sliderLastPosition){
-          this.props.sliderLastPosition(sliderPosition);
+          this.props.sliderLastPosition(listenerPosition);
         }
       },
     });
