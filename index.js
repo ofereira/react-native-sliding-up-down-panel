@@ -20,7 +20,7 @@ const SlidingPanelIOS = (props) => (
       {...props.panResponder} style={{height: props.headerPanelHeight,}}>
       {props.headerView()}
     </Animated.View>
-    <View 
+    <View
       style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}
       {...props.panResponder}>
       {props.slidingPanelView()}
@@ -34,7 +34,7 @@ const SlidingPanelAndroid = (props) => (
       {...props.panResponder} style={{height: props.headerPanelHeight,}}>
       {props.headerView()}
     </Animated.View>
-    <Animated.View 
+    <Animated.View
       style={props.panelPosition === 'bottom' ? {top: props.headerPanelHeight, left: 0, position: 'absolute',} : {bottom: props.headerPanelHeight, left: 0, position: 'absolute',}}
       {...props.panResponder}>
       {props.slidingPanelView()}
@@ -140,7 +140,6 @@ export default class SlidingPanel extends Component {
               }
               break;
             }
-  
             default: {
               this.goToMiddle();
               break;
@@ -152,6 +151,7 @@ export default class SlidingPanel extends Component {
           this.props.sliderLastPosition(listenerPosition);
         }
       },
+      ...props.panResponder
     });
   }
 
