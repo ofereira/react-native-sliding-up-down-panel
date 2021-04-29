@@ -131,18 +131,21 @@ export default class SlidingPanel extends Component {
           }
         }else{
           //tap
-          switch(true) {
-            case (sliderPosition >= (this.props.maxHeight * 0.3) && sliderPosition <= (this.props.maxHeight * 0.7)): {
-              if (this.state.previousStatus === TOP) {
-                this.goToBottom();
-              } else {
-                 this.goToTop();
+          if(this.props.allowTapping){
+            switch(true) {
+              case (sliderPosition >= (this.props.maxHeight * 0.3) && sliderPosition <= (this.props.maxHeight * 0.7)): {
+                if (this.state.previousStatus === TOP) {
+                  this.goToBottom();
+                } else {
+                   this.goToTop();
+                }
+                break;
               }
-              break;
-            }
-            default: {
-              this.goToMiddle();
-              break;
+
+              default: {
+                this.goToMiddle();
+                break;
+              }
             }
           }
         }
@@ -272,6 +275,7 @@ SlidingPanel.propTypes = {
   panelPosition: PropTypes.string,
   visible: PropTypes.bool,
   allowDragging: PropTypes.bool,
+  allowTapping: PropTypes.bool,
   allowAnimation: PropTypes.bool,
   minHeight: PropTypes.number,
   onDragStart: (event, gestureState) => {},
@@ -293,6 +297,7 @@ SlidingPanel.defaultProps = {
   onAnimationStop: () => {},
   slidingPanelLayout: () => {},
   allowDragging: true,
+  allowTapping: true,
   allowAnimation: true,
   slidingPanelLayoutHeight: 0,
   AnimationSpeed: 1000,
